@@ -1,0 +1,301 @@
+/***
+ * @Author Benjamin Bascom
+ * @Date 1/4/13
+ * @Assignment CIT594 Trees
+ */
+
+package tree;
+
+import static java.util.Arrays.*;
+import java.util.ArrayList;
+import java.util.*;
+import static java.lang.String.*;
+import static java.lang.Character.*;
+
+class Tree<V> {
+    V value = null;
+    ArrayList<Tree<V>> children = new ArrayList<Tree<V>>();
+
+    /**
+     * Constructor for the subtree with value
+     * as the root and children as the children
+     * @param value Root of this subtree
+     * @param children Children of this tree
+     **/
+    public Tree(V value, Tree<V>... children) {
+	this.value = value;
+
+	for (Tree<V> child : children) {
+	    this.children.add(child);
+	}
+    };
+
+    /**
+     * Sets the root of this subtree to value
+     * @param V value to set as root of this subtree
+     **/
+    public void setValue(V value) {
+	this.value = value;
+    };
+
+    /**
+     * Get the value of the root for this subtree
+     * @return V value to return
+     **/
+    public V getValue() {
+	return value;
+    };
+
+    /**
+     * Adds a subtree to this tree at index index
+     * @param int index at which to add child
+     * @param Tree<V> to add as a child
+     **/
+    public void addChild(int index, Tree<V> child) {
+	if (!(contains(child)))
+	    children.add(index, child);
+	else
+	    throw new IllegalArgumentException();
+
+    };
+
+    /**
+     * Adds an arbitrary number of subtrees to this tree
+     **/
+    public void addChildren(Tree<V>... children) {
+	for (Tree<V> newChild : children) {
+	    if (!(contains(newChild)))
+		this.children.add(newChild);
+	    else
+		throw new IllegalArgumentException();
+	}
+    };
+
+
+    /**
+     * Returns the number of children of this subtree
+     * @return integer number of children
+     **/
+    public int getNumberOfChildren() {
+	return children.size();
+    };
+
+    /**
+     * Returns child subtree at a given index
+     * @param index of subtree to return
+     **/
+    public Tree<V> getChild(int index) {
+	return children.get(index);
+    };
+
+    /**
+     * Returns an iterator for this subtree
+     **/
+    public Iterator<Tree<V>> iterator() {
+    	return children.iterator();
+    };
+
+    /**
+     * Tests if this subtree contains another subtree "node"
+     * @param node to test for containment
+     * @return boolean value whether or not node is contained
+     **/
+    public boolean contains(Tree<V> node) {
+
+	if (this == node) {
+	    return true;
+	} else {
+	    for (Tree<V> child : children)
+		if (child.contains(node))
+		    return true;	
+	}
+	return false;
+
+    };
+
+    /**
+     * Recursive parser of normalized strings into Tree<String>s
+     * @param valid description, can contain any number of whitespaces 
+     * but must have contiguous tokens and legal parenthesis / dependencies
+     * (all open parens must follow valid tokens, obeying the rules of a properly formatted 'tree') 
+     * @return a new Tree<String> with the form specified by the input string
+     */
+    public static Tree<String> parse(String treeDescription) {
+	int i, j;
+	String thisToken = "", subContext;
+	char thisChar;
+	Tree<String> root;
+
+	char[] treeArray = treeDescription.split(" ");
+	root = Tree<String>(treeArray[0].replace(")", ""));
+
+
+	// Leaf
+	if (!(hasChildren(i, treeDescription)))
+	    return root;
+	else  {
+	    subContext = treeDescription.substring(i, matchParen(i, treeDescription));
+	    root.addChild(root.getNumberOfChildren(), parse(subContext));
+	}
+	return root;
+	   
+    };
+
+    
+
+
+    /**
+     * Method to determine if the token we're looking at has children
+     * @param index of last char seen in string
+     * @param string to check for children of the token we last saw at lastChar
+     * 
+     */
+    public static boolean hasChildren(int lastChar, String thisString) {
+	if (thisString.indexOf("(") == -1)
+	    return false;
+	else if (thisString.indexOf("(")-2 == lastChar)
+	    return true;
+
+	return false;	    
+    };
+
+
+    /**
+     * Method for finding a substring to match a paren
+     * @param index of paren to match
+     * @param treeDescription String representation of tree in normalized form
+     */
+    public static int matchParen(int index, String treeDescription) {
+	ArrayList<Character> parens = new ArrayList<Character>();
+	parens.add(treeDescription.charAt(index));
+	String string = "";
+
+	while (!(parens.isEmpty())) {
+	    index++;
+	    if (treeDescription.charAt(index) == '(')
+		parens.add(treeDescription.charAt(index));
+	    else if (treeDescription.charAt(index) == ')') {
+		parens.remove(parens.size()-1);
+	    };
+	};
+
+
+	return index+1;	
+    };
+
+
+    /**
+     * Method for stripping out whitespace to normalize
+     * form of input for parse method
+     */
+    public static String stripSpace(String input) {
+	String strippedString = "";
+	int i; 
+	
+	for (i=0; i<input.length(); i++) {
+	    if (!(isSpace(input.charAt(i)))) 
+		strippedString += input.charAt(i);
+	    else if (i>0 && i<input.length()-1) {
+		if ((!isSpace(input.charAt(i-1)) && input.charAt(i-1) != '(' && input.charAt(i-1) != ')') || (!isSpace(input.charAt(i+1)) && input.charAt(i+1) != '(' && input.charAt(i+1) != ')'))
+		    strippedString += input.charAt(i); 
+	    }
+		
+	};
+
+	return strippedString;
+    };
+
+
+    /**
+     * Method to print the values in a tree
+     * wrapper for recursive 'deepPrint'
+     */
+    public void print() {
+	deepPrint(0, this);
+    };
+
+
+    /**
+     * Method to print the values in a tree
+     * recurisvely
+     * @param context an integer representing current depth
+     * @param tree The current subtree being printed
+     */
+    private void deepPrint(int context, Tree<V> tree) {
+	int i;
+	Iterator<Tree<V>> children = tree.iterator();
+
+	for (i = 0; i < context; i++) {
+	    System.out.print("|  ");
+	};
+
+	System.out.println(tree.value);
+	context++;	
+	while (children.hasNext()) {
+	    deepPrint(context, children.next());
+	};	
+	context--;
+
+    };
+
+    /**
+     * Method to turn a tree into a string where parens
+     * represent dependencies
+     * @return a String representation of this tree
+     */
+    @Override
+    public String toString() {
+	return deepToString(this);
+    };
+
+    public String deepToString(Tree<V> tree) {
+	Iterator<Tree<V>> children = tree.iterator();
+	String s = "";
+	
+	s += tree.getValue() + " ";
+	if (tree.getNumberOfChildren() > 0)
+	    s += "(";
+
+	while (children.hasNext()) {
+	    s += deepToString(children.next()) + " ";
+	};
+
+	if (tree.getNumberOfChildren() > 0)
+	    s += ")";
+
+	return stripSpace(s);
+
+    };
+    
+    /**
+     * Method to test if 2 arrays have the same structure and the same values at each subnode
+     * @param obj to compare
+     * @return boolean equality
+     */
+    @Override
+    public boolean equals(Object obj) {
+	Tree<V> comp;
+	Iterator<Tree<V>> thisIt, thatIt;
+
+	if (!(obj instanceof Tree)) {
+	    return false;
+	};
+
+	comp = (Tree<V>) obj;
+	thisIt = iterator();
+	thatIt = comp.iterator();
+
+	if (!(getValue().equals(comp.getValue())) || getNumberOfChildren() != comp.getNumberOfChildren()) {
+	    return false;
+	};
+
+
+	while (thisIt.hasNext())
+	    while (thatIt.hasNext()) 
+		return thisIt.next().equals(thatIt.next());
+
+	return true;
+    };
+
+
+}

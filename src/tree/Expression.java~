@@ -1,0 +1,11 @@
+package tree;
+
+class Expression {
+    
+    public Expression(String expression) {}; 
+
+    public int evaluate() { return 0; };
+
+    @Override
+    public String toString() { return ""; };
+}

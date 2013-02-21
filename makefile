@@ -1,0 +1,10 @@
+all: tree treeTest expressionTest
+
+tree:
+	javac -d ~/Scripts/Java/Tree_BenBascom/bin/tree -cp ~/Scripts/Java/junit-4.10.jar ~/Scripts/Java/Tree_BenBascom/src/tree/*.java
+
+treeTest:
+	java -cp ~/Scripts/Java/junit-4.10.jar:./bin/tree org.junit.runner.JUnitCore tree.TreeTest
+
+expressionTest:
+	java -cp ~/Scripts/Java/junit-4.10.jar:./bin/tree org.junit.runner.JUnitCore tree.ExpressionTest

@@ -1,0 +1,65 @@
+package tree;
+
+import org.junit.Before;
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class ExpressionTest {
+    Expression a, b, c, d, x, y, z;
+    Tree<String> t, u, v;
+
+    @Before
+    public void setUp() {
+	a = new Expression("5");
+	b = new Expression("+ (5 2)");
+	c = new Expression("+ (5 * (2 4))");
+	d = new Expression("/ (6 3)");
+	x = new Expression("/ (7 4)");
+	y = new Expression("- (13 3)");
+	z = new Expression("+ (500 3 7 * (33 46 / ( 2 3 )) 45)");
+    }
+
+    @Test
+    public void testIsLegal() {
+	String r = "a";
+	String s = "5";
+	String m = "*";
+	String q = "?";
+	assertTrue(Expression.isLegal(s));
+	assertTrue(Expression.isLegal(m));
+	assertFalse(Expression.isLegal(q));
+	assertFalse(Expression.isLegal(r));
+		   
+       
+    }
+
+    @Test
+    public void testTreeLegal() {
+	t = new Tree<String>("+ (5 2 )");
+	u = new Tree<String>("p (7 3)");
+
+	assertTrue(Expression.treeLegal(t));
+	assertFalse(Expression.treeLegal(u));
+    }
+
+
+    @Test
+    public void testEvaulate() {
+	assertEquals(5, a.evaluate());
+	assertEquals(7, b.evaluate());
+	assertEquals(13, c.evaluate());
+	assertEquals(2, d.evaluate());
+	assertEquals(1, x.evaluate());
+	assertEquals(10, y.evaluate());
+
+    }
+
+    @Test
+    public void testToString() {
+	assertTrue(a.toString().equals("5"));
+	assertTrue(b.toString().equals("(5)+(2)"));
+	assertTrue(c.toString().equals("((2)*(4))+(5)"));
+	
+    }
+
+}
